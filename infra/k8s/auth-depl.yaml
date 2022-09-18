@@ -5,7 +5,7 @@ metadata:
 spec:
   replicas: 1
   selector:
-    mathLabels:
+    matchLabels:
       app: auth
   template:
     metadata:
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: ozshm/auth
+          image: ozshm/auth:1.0
 ---
 apiVersion: v1
 kind: Service
