@@ -6,7 +6,9 @@ import {
   requireAuth,
   NotAuthorizedError
 } from '@osticketing/common';
-import { Ticket } from '../Models/ticket';
+import { Ticket } from '../models/ticket';
+import { TicketUpdatedPublsher } from '../events/ticket-updated-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
 
@@ -39,6 +41,13 @@ router.put('/api/tickets/:id',
     price: req.body.price
   });
   await ticket.save();
+
+  new TicketUpdatedPublsher(natsWrapper.client).publish({
+    id: ticket.id,
+    title: ticket.title,
+    price: ticket.price,
+    userId: ticket.userId
+  });
 
   res.send(ticket)
 

@@ -2,6 +2,7 @@ import request from 'supertest';
 import { app } from '../../app';
 import mongoose from 'mongoose';
 import { OperationCanceledException } from 'typescript';
+import { natsWrapper } from '../../nats-wrapper';
 
 const createTicket = (title: string, price: number, cookie?: string[]) => {
   return request(app)
@@ -115,3 +116,25 @@ it('updated the ticket provided valid inputs', async () => {
 
 
 });
+
+it('publishes an event', async () => {
+  const cookie = global.signin();
+
+  const response = await createTicket('abcd', 20, cookie);
+
+  const newTitle = 'new title';
+  const newPrice = 100;
+
+  await request(app)
+    .put(`/api/tickets/${response.body.id}`)
+    .set('Cookie', cookie)
+    .send({
+      title: newTitle,
+      price: newPrice
+    })
+    .expect(200);
+
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
+
+
+})
