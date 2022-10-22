@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { app } from '../../app';
 import mongoose from 'mongoose';
-import { OperationCanceledException } from 'typescript';
+import { Ticket } from '../../models/ticket';
 import { natsWrapper } from '../../nats-wrapper';
 
 const createTicket = (title: string, price: number, cookie?: string[]) => {
@@ -136,5 +136,26 @@ it('publishes an event', async () => {
 
   expect(natsWrapper.client.publish).toHaveBeenCalled();
 
+});
 
+it('rejects updates if the tickets is reserved', async () => {
+  const cookie = global.signin();
+
+  const response = await createTicket('abcd', 20, cookie);
+
+  const ticket = await Ticket.findById(response.body.id);
+  ticket!.set({ orderId: new mongoose.Types.ObjectId().toHexString() });
+  await ticket!.save();
+  
+  const newTitle = 'new title';
+  const newPrice = 100;
+
+  await request(app)
+    .put(`/api/tickets/${response.body.id}`)
+    .set('Cookie', cookie)
+    .send({
+      title: newTitle,
+      price: newPrice
+    })
+    .expect(400);
 })

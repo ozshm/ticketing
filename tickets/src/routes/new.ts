@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 import { requireAuth, validateRequest } from '@osticketing/common';
 import { Ticket } from '../models/ticket';
-import { TicketCreatedPublsher } from '../events/publishers/ticket-created-publisher';
+import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher';
 import { natsWrapper } from '../nats-wrapper';
 
 const router = express.Router();
@@ -26,12 +26,13 @@ async (req: Request, res: Response) => {
   });
   await ticket.save();
 
-  await new TicketCreatedPublsher(natsWrapper.client).publish({
+  await new TicketCreatedPublisher(natsWrapper.client).publish({
     id: ticket.id,
+    version: ticket.version,
     title: ticket.title,
     price: ticket.price,
     userId: ticket.userId,
-  })
+  });
 
   res.status(201).send(ticket);
 });
