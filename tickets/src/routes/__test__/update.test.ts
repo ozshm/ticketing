@@ -26,17 +26,6 @@ it('returns a 404 if the provided id does not exist', async () => {
     .expect(404);
 });
 
-it('returns a 401 if the user is not authenticated', async () => {
-  const id = new mongoose.Types.ObjectId().toHexString();
-  await request(app)
-    .put(`/api/tickets/${id}`)
-    .send({
-      title: 'sdadad',
-      price: 20
-    })
-    .expect(401);
-});
-
 it('returns a 401 if the user does not own the ticket', async () => {
 
   const title = 'dsscvx';
