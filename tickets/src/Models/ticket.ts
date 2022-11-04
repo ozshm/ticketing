@@ -34,8 +34,8 @@ const ticketSchema = new mongoose.Schema(
       required: true,
     },
     orderId: {
-      type: String
-    }
+      type: String,
+    },
   },
   {
     toJSON: {
