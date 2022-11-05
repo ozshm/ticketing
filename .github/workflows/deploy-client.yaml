@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest 
         steps: 
             - uses: actions/checkout@v2 
-            - run: cd client && docker build -t ozshm/client .
+            - run: cd client && docker build -t ozshm/client:1.0 .
             - 
               name: Login to Docker hub
               uses: docker/login-action@v2 
